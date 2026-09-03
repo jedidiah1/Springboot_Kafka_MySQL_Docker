@@ -91,6 +91,7 @@
 				</executions>
 			</plugin>
 		</plugins>
+		 <finalName>base-domains</finalName>
 	</build>
 
 </project>
