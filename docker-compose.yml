@@ -15,6 +15,12 @@ services:
     container_name: kafka1
     ports:
       - "9091:9091"
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server=localhost:9091", "--list"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -29,6 +35,12 @@ services:
     container_name: kafka2
     ports:
       - "9093:9093"
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server=localhost:9093", "--list"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
     environment:
       KAFKA_BROKER_ID: 2
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -43,6 +55,13 @@ services:
     container_name: kafka3
     ports:
       - "9094:9094"
+
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server=localhost:9094", "--list"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
     environment:
       KAFKA_BROKER_ID: 3
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -97,6 +116,13 @@ services:
       MYSQL_PASSWORD: favourite1
     ports:
       - "3306:3306"
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-pfavourite1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
     volumes:
       - mysql_data:/var/lib/mysql
 
@@ -130,10 +156,14 @@ services:
       SPRING_DATASOURCE_USERNAME: kafkaUser
       SPRING_DATASOURCE_PASSWORD: favourite1
     depends_on:
-      - kafka1
-      - kafka2
-      - kafka3
-      - mysql
+      kafka1: 
+        condition: service_healthy
+      kafka2:
+        condition: service_healthy
+      kafka3:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
 
   base-domains:
     build: ./base-domains
