@@ -129,9 +129,13 @@ services:
   # --- Microservices ---
   email-service:
     build: ./email-service
-    container_name: email-service
+
+    # Remove the container_name to be able to scale
+    #container_name: email-service
     ports:
-      - "8081:8081"
+      # Revome the Host Port to prevent port conflict on port 8081
+      #- "8081:8081"
+      - "8081"
     environment:
       SPRING_PROFILES_ACTIVE: docker
       KAFKA_BOOTSTRAP_SERVERS: kafka1:29092,kafka2:29092,kafka3:29092
